@@ -9,9 +9,10 @@ class Eatable:
         self.eater = None
         self.removed = False
     
-    def update(self):
+    def update(self, game):
         if self.eater is None:
             return
+        
 
         # Calculate direction vector
         eater_pos = self.eater.body[0]
