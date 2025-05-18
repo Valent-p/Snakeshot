@@ -19,8 +19,8 @@ class Snake:
     def gen_body(self):
         """Generate initial body"""
         for n in range(20):
-            x = 300 - n * self.speed
-            y = 300
+            x = random.randint(0, 700) - n * self.speed
+            y = random.randint(0,700)
             self.body.append(Vector2(x, y))
     
     def grow(self, count):

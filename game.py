@@ -17,7 +17,7 @@ class Game:
 
         # Initialize game objects
         self.player = Snake()
-        self.snakes = [self.player, AISnake()]
+        self.snakes = [self.player, AISnake(), AISnake(), AISnake()]
         self.food_list = []
         self.score_font = pg.font.Font('freesansbold.ttf', 32)
 
@@ -54,6 +54,8 @@ class Game:
         for snake in self.snakes:
             snake.update(self)
             snake_pos = snake.body[0]
+            
+            # snake eat food
             for food in self.food_list[:]:
                 dx = food.x - snake_pos[0]
                 dy = food.y - snake_pos[1]
@@ -62,6 +64,30 @@ class Game:
                     food.eater = snake
                     snake.grow(1)
                     snake.score += 1
+                #> if
+            #> for
+            
+            # Snake eats snake
+            for other_snake in self.snakes[:]:
+                # Cannot eat self
+                if other_snake == snake:
+                    continue 
+                
+                for seg in other_snake.body[:]:
+                    dx = snake_pos[0] - seg[0]
+                    dy = snake_pos[1] - seg[1]
+                    dist = math.hypot(dx, dy)
+                    # Eats
+                    if dist < max(other_snake.radius, snake.radius):
+                        other_snake.body.remove(seg)
+                        # Dead, remove it
+                        
+                if not len(other_snake.body):
+                    self.snakes.remove(other_snake)
+                    continue 
+                #> for
+            #> for           
+        #> for
 
         # Update food
         for food in self.food_list[:]:
