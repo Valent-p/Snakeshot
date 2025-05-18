@@ -9,8 +9,8 @@ from food import Apple
 class Game:
     def __init__(self):
         # Initialize game window
-        self.width = 1280//2
-        self.height = 720
+        self.width = int(720*1.5)
+        self.height = int(1280*1.5)
         self.screen = pg.display.set_mode((self.width, self.height))
         self.clock = pg.time.Clock()
         self.running = True
@@ -18,7 +18,7 @@ class Game:
 
         # Initialize game objects
         self.player = Snake()
-        self.snakes = [self.player, AISnake(), AISnake(), AISnake()]
+        self.snakes = [self.player, AISnake(), AISnake(), AISnake(), AISnake()]
         self.food_list = []
         self.score_font = pg.font.Font('freesansbold.ttf', 32)
         self.head_top_font = pg.font.Font('freesansbold.ttf', 24)
@@ -50,9 +50,13 @@ class Game:
 
     def update(self):
         # Add food randomly
-        if random.random() < 0.01:
+        if random.random() < 0.05:
             self.food_list.append(Apple(random.randint(0, self.width), random.randint(0, self.height)))
-
+        
+        # Add more snakes randomly 
+        if random.random() < 0.008:
+            self.snakes.append(AISnake())
+            
         # Update snakes
         for snake in self.snakes:
             snake.update(self)

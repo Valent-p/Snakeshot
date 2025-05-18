@@ -9,7 +9,7 @@ class Snake:
         self.colors = ("teal", "green", "black") # head, body 
         self.body = []
         self.direction = Vector2(1, 0)  # Right
-        self.speed = 5 # Smooth movement speed (pixels/frame)
+        self.speed = 10# Smooth movement speed (pixels/frame)
         self.gen_body()
         
         # stats
