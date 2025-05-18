@@ -14,12 +14,15 @@ class Game:
         self.screen = pg.display.set_mode((self.width, self.height))
         self.clock = pg.time.Clock()
         self.running = True
+        self.top_score = 0
 
         # Initialize game objects
         self.player = Snake()
         self.snakes = [self.player, AISnake(), AISnake(), AISnake()]
         self.food_list = []
         self.score_font = pg.font.Font('freesansbold.ttf', 32)
+        self.head_top_font = pg.font.Font('freesansbold.ttf', 24)
+
 
     def handle_events(self):
         # Handle events
@@ -47,7 +50,7 @@ class Game:
 
     def update(self):
         # Add food randomly
-        if random.random() < 0.001:
+        if random.random() < 0.01:
             self.food_list.append(Apple(random.randint(0, self.width), random.randint(0, self.height)))
 
         # Update snakes
@@ -62,29 +65,34 @@ class Game:
                 dist = math.hypot(dx, dy)
                 if dist < (snake.radius + food.radius):
                     food.eater = snake
-                    snake.grow(1)
+                    snake.grow(5)
                     snake.score += 1
+                    if snake.score > self.top_score:
+                        self.top_score = snake.score
                 #> if
             #> for
             
             # Snake eats snake
-            for other_snake in self.snakes[:]:
+            for other_snake in self.snakes:
+                if not len(snake.body):
+                    break 
+                
                 # Cannot eat self
                 if other_snake == snake:
                     continue 
                 
-                for seg in other_snake.body[:]:
+                for seg in other_snake.body:
                     dx = snake_pos[0] - seg[0]
                     dy = snake_pos[1] - seg[1]
                     dist = math.hypot(dx, dy)
-                    # Eats
-                    if dist < max(other_snake.radius, snake.radius):
-                        other_snake.body.remove(seg)
+                    # Eats, (use the minimum radius)
+                    if dist < min(other_snake.radius, snake.radius):
                         # Dead, remove it
+                        snake.body.pop()
                         
-                if not len(other_snake.body):
-                    self.snakes.remove(other_snake)
-                    continue 
+                    if not len(snake.body):
+                        self.snakes.remove(snake)
+                        break 
                 #> for
             #> for           
         #> for
@@ -102,7 +110,7 @@ class Game:
         pg.draw.rect(self.screen, "purple", pg.Rect(0, 0, self.width, self.height)) 
 
         # Draw score
-        self.screen.blit(self.score_font.render(f"Score: {self.snakes[0].score}", True, "white"), (100, 100))
+        self.screen.blit(self.score_font.render(f"Top Score: {self.top_score}", True, "white"), (100, 100))
 
         # Draw snakes
         for snake in self.snakes:
@@ -111,6 +119,14 @@ class Game:
             for pos in snake.body:
                 pg.draw.circle(self.screen, snake.colors[1], (int(pos[0]), int(pos[1])), snake.radius)
             pg.draw.circle(self.screen, snake.colors[0], (int(snake.body[0][0]), int(snake.body[0][1])), snake.radius)
+            self.screen.blit(
+                self.head_top_font.render(f":{snake.score}", True, "white"), 
+                (
+                    int(snake.body[0][0]),
+                    int(snake.body[0][1]-32)
+                ) 
+            )
+
 
         # Draw food
         for food in self.food_list:
